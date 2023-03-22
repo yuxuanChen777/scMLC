@@ -17,5 +17,5 @@ The third step is weighting cells;
 The last step is clustering by the multiplex network Louvain.
 
 Usage
-import imputation.py into bayesmodel.py
-run the bayesmodel.py
+run the lymph.R
+run the Louvain.py
