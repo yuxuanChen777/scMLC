@@ -36,19 +36,7 @@ atac <- CreateSeuratObject(counts=mix_atac,project = 'mix_atac',assay='ATAC',min
 ############################################################################################
 rna <- SCTransform(rna,method = "glmGamPoi",verbose = FALSE) %>% RunPCA()
 ElbowPlot(rna)
-# rna <- NormalizeData(rna, normalization.method = "LogNormalize", scale.factor = 10000)
-# rna <- ScaleData(rna)
-# rna <- RunPCA(rna, features = VariableFeatures(object = rna))
 rna <- FindNeighbors(rna, dims = 1:10)#25
-
-# rna <- FindClusters(rna, resolution = 0.6)
-# clustering_evaluate(Y,Idents(rna))
-
-# NMI : 0.3541437293800133   1:25 4000 0.55
-# ARI : 0.1833864503862898
-
-# NMI : 0.34813793616904926  1:25 3000 0.5
-# ARI : 0.17823115547904422
 rna_layer <- as.data.frame(rna@graphs$SCT_nn)
 write.table(rna_layer,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_rna_layer.csv',sep = ',',row.names = T,col.names = T)
 ############################################################################################
@@ -58,8 +46,6 @@ atac_tmp <-devianceFeatureSelection(as.matrix(mix_atac))
 atac_tmp <- as.data.frame(atac_tmp)
 atac_tmp$peak_name <- rownames(atac_tmp)
 atac_tmp <- atac_tmp[order(-atac_tmp$atac_tmp),]
-# mean(atac_tmp$atac_tmp)
-# median(atac_tmp$atac_tmp)
 atac_var <- atac_tmp[1:35000,]
 
 atac_var <- atac_var$peak_name
@@ -67,8 +53,6 @@ atac@assays$ATAC@var.features <- atac_var
 atac <- RunTFIDF(atac)
 atac <- RunSVD(atac)
 atac <- FindNeighbors(object = atac, reduction = 'lsi', dims = 2:10)
-# atac <- FindClusters(atac, resolution = 0.77)
-# clustering_evaluate(Y,Idents(atac))
 atac_layer <- as.data.frame(atac@graphs$ATAC_nn)
 write.table(atac_layer,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_atac_layer.csv',sep = ',',row.names = T,col.names = T)
 
@@ -79,15 +63,11 @@ rna <- CreateSeuratObject(counts = mix_rna, project = "mix_rna",min.cells = 10)
 atac <- CreateSeuratObject(counts=mix_atac,project = 'mix_atac',assay='ATAC',min.cells = 10)
 
 rna <- SCTransform(rna,method = "glmGamPoi",verbose = FALSE)
-# rna <- NormalizeData(rna, normalization.method = "LogNormalize", scale.factor = 10000)
-# rna <- ScaleData(rna)
 ###########################################################################################
 atac_tmp <-devianceFeatureSelection(as.matrix(mix_atac))
 atac_tmp <- as.data.frame(atac_tmp)
 atac_tmp$peak_name <- rownames(atac_tmp)
 atac_tmp <- atac_tmp[order(-atac_tmp$atac_tmp),]
-# mean(atac_tmp$atac_tmp)
-# median(atac_tmp$atac_tmp)
 atac_var <- atac_tmp[1:35000,]
 atac_var <- atac_var$peak_name
 atac@assays$ATAC@var.features <- atac_var
@@ -181,7 +161,7 @@ cell_weight$W <-res
 
 
 write.table(cell_weight,file='/home/yxchen/JupyterNotebook/Python_Louvain_op/lymph_cell_weight.csv',sep = ',',col.names = T)
-#########################################################################
+#################################################################################################################################
 rna <- RunPCA(rna,features = rna_cca)
 atac <- RunSVD(atac,features = atac_cca)
 rna <- FindNeighbors(rna,dims=1:10)
