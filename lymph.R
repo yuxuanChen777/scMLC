@@ -34,16 +34,6 @@ atac <- CreateSeuratObject(counts=mix_atac,project = 'mix_atac',assay='ATAC',min
 ############################################################################################
 #                       第二层scry特征提取的RNA网络                                        #                         
 ############################################################################################
-rna_tmp <-devianceFeatureSelection(as.matrix(mix_rna))
-rna_tmp <- as.data.frame(rna_tmp)
-rna_tmp$gene_name <- rownames(rna_tmp)
-rna_tmp <- rna_tmp[order(-rna_tmp$rna_tmp),]
-mean(rna_tmp$rna_tmp)
-median(rna_tmp$rna_tmp)
-rna_var <- rna_tmp[1:3000,]
-rna_var <- rna_var$gene_name
-rna@assays$RNA@var.features <- rna_var
-
 rna <- SCTransform(rna,method = "glmGamPoi",verbose = FALSE) %>% RunPCA()
 ElbowPlot(rna)
 # rna <- NormalizeData(rna, normalization.method = "LogNormalize", scale.factor = 10000)
@@ -71,15 +61,7 @@ atac_tmp <- atac_tmp[order(-atac_tmp$atac_tmp),]
 # mean(atac_tmp$atac_tmp)
 # median(atac_tmp$atac_tmp)
 atac_var <- atac_tmp[1:35000,]
-# atac_tmp <- atac_tmp[atac_tmp$atac_tmp !='NaN',]
-# atac_tmp_over <- atac_tmp[ceiling(atac_tmp$atac_tmp)>floor(mean(floor(atac_tmp$atac_tmp))),]
-# length(atac_tmp_over$atac_tmp)
-# strsplit(as.character(length(atac_tmp_over$atac_tmp)),'')
-# a <- strsplit(as.character(length(atac_tmp_over$atac_tmp)),'')
-# length(a[[1]])
-# 
-# round(length(atac_tmp_over$atac_tmp),-(length(a[[1]])-1))+5*(10**(length(a[[1]])-2))
-# atac_var <- atac_tmp[1:(round(length(atac_tmp_over$atac_tmp),-(length(a[[1]])-1))+5*(10**(length(a[[1]])-2))),]
+
 atac_var <- atac_var$peak_name
 atac@assays$ATAC@var.features <- atac_var
 atac <- RunTFIDF(atac)
@@ -89,11 +71,6 @@ atac <- FindNeighbors(object = atac, reduction = 'lsi', dims = 2:10)
 # clustering_evaluate(Y,Idents(atac))
 atac_layer <- as.data.frame(atac@graphs$ATAC_nn)
 write.table(atac_layer,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_atac_layer.csv',sep = ',',row.names = T,col.names = T)
-# NMI : 0.18621471627655053   25000 2:15 0.68
-# ARI : 0.08606617263639169
-
-# NMI : 0.20866045478669915   35000 2:15 0.77
-# ARI : 0.11280298917922336
 
 ############################################################################################
 #         第一层CCA特征提取网络（此处获得的是RNA，ATAC分别的两层，稍后会网络融合）         #
@@ -101,15 +78,6 @@ write.table(atac_layer,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY
 rna <- CreateSeuratObject(counts = mix_rna, project = "mix_rna",min.cells = 10)
 atac <- CreateSeuratObject(counts=mix_atac,project = 'mix_atac',assay='ATAC',min.cells = 10)
 
-rna_tmp <-devianceFeatureSelection(as.matrix(mix_rna))
-rna_tmp <- as.data.frame(rna_tmp)
-rna_tmp$gene_name <- rownames(rna_tmp)
-rna_tmp <- rna_tmp[order(-rna_tmp$rna_tmp),]
-mean(rna_tmp$rna_tmp)
-median(rna_tmp$rna_tmp)
-rna_var <- rna_tmp[1:3000,]
-rna_var <- rna_var$gene_name
-rna@assays$RNA@var.features <- rna_var
 rna <- SCTransform(rna,method = "glmGamPoi",verbose = FALSE)
 # rna <- NormalizeData(rna, normalization.method = "LogNormalize", scale.factor = 10000)
 # rna <- ScaleData(rna)
@@ -121,15 +89,6 @@ atac_tmp <- atac_tmp[order(-atac_tmp$atac_tmp),]
 # mean(atac_tmp$atac_tmp)
 # median(atac_tmp$atac_tmp)
 atac_var <- atac_tmp[1:35000,]
-# atac_tmp <- atac_tmp[atac_tmp$atac_tmp !='NaN',]
-# atac_tmp_over <- atac_tmp[ceiling(atac_tmp$atac_tmp)>floor(mean(floor(atac_tmp$atac_tmp))),]
-# length(atac_tmp_over$atac_tmp)
-# strsplit(as.character(length(atac_tmp_over$atac_tmp)),'')
-# a <- strsplit(as.character(length(atac_tmp_over$atac_tmp)),'')
-# length(a[[1]])
-# 
-# round(length(atac_tmp_over$atac_tmp),-(length(a[[1]])-1))+5*(10**(length(a[[1]])-2))
-# atac_var <- atac_tmp[1:(round(length(atac_tmp_over$atac_tmp),-(length(a[[1]])-1))+5*(10**(length(a[[1]])-2))),]
 atac_var <- atac_var$peak_name
 atac@assays$ATAC@var.features <- atac_var
 atac <- RunTFIDF(atac)
@@ -233,12 +192,3 @@ atac_knn <- as.data.frame(atac@graphs$ATAC_nn)
 write.table(rna_knn,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_RNA_SGCCA_layer.csv',sep = ',',row.names = T,col.names = T)
 write.table(atac_knn,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_ATAC_SGCCA_layer.csv',sep = ',',row.names = T,col.names = T)
 
-############################################################################################
-#                        聚类结果检测                                                      #
-# # ############################################################################################
-# cell_remark <-read.table('lymph_cluster.csv',sep=',')
-# Y <-cell_remark$cluster_id
-# length(unique(Y)) #9
-# source_python("metrics.py") 
-# clustering_evaluate(Y,Idents(rna))
-# clustering_evaluate(Y,Idents(atac))
