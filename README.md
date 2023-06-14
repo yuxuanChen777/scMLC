@@ -20,5 +20,11 @@ Lymph: RNA + ATAC
  * The last step is clustering by the multiplex network Louvain.  
 
 # Usage
+```
 run the lymph.R  
 run the Louvain.ipynb
+```
+
+```
+
+```
