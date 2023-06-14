@@ -26,7 +26,7 @@ Run the code in this way
 run the lymph.R  
 run the Louvain.ipynb
 ```
-preprocessing
+Preprocessing
 ```
 getwd()
 setwd('/home/yxchen/R/R_data/Seurat/Lymph')
@@ -38,9 +38,6 @@ library(reticulate)
 library(Signac)
 library(RGCCA)
 library(scry)
-#
-#
-
 
 library(foreach)
 library(doParallel)
@@ -144,7 +141,7 @@ atac_mm <-as.data.frame(atac@assays$ATAC@scale.data)
 
 K=20
 F_num=nrow(rna_mm)
-RNA_annoy <- new(AnnoyEuclidean,F_num)#计算的是欧氏距离
+RNA_annoy <- new(AnnoyEuclidean,F_num)
 for (i in 1:ncol(rna_mm))
 {
   RNA_annoy$addItem(i,rna_mm[,i])
@@ -153,7 +150,7 @@ for (i in 1:ncol(rna_mm))
 RNA_annoy$build(50)
 
 F_num_a=nrow(atac_mm)
-ATAC_annoy <- new(AnnoyEuclidean,F_num_a)#计算的是欧氏距离
+ATAC_annoy <- new(AnnoyEuclidean,F_num_a)
 for (i in 1:ncol(atac_mm))
 {
   ATAC_annoy$addItem(i,atac_mm[,i])
