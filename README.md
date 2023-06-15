@@ -201,6 +201,7 @@ write.table(rna_knn,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_ly
 write.table(atac_knn,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_ATAC_SGCCA_layer.csv',sep = ',',row.names = T,col.names = T) #Output scATAC monolayer network after cross-modal feature selection
 
 ```
+###multiplex network community detection###
 ```
 import networkx as nx
 import random as rd
