@@ -201,7 +201,7 @@ write.table(rna_knn,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_ly
 write.table(atac_knn,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_ATAC_SGCCA_layer.csv',sep = ',',row.names = T,col.names = T) #Output scATAC monolayer network after cross-modal feature selection
 
 ```
-###multiplex network community detection###
+**multiplex network community detection**
 ```
 import networkx as nx
 import random as rd
@@ -212,27 +212,17 @@ import operator
 import metrics
 import umap
 import numpy as np
-# cell_weight_df = pd.read_csv('sci_CAR_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('P0_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('LLL_CTRL_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('Paired_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('celllinemixture_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('PBMC10_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('NEAT_seq_MIX_cell_weight.csv',sep=',',header=0)
+
 cell_weight_df = pd.read_csv('lymph_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('NEAT_seq_CD4T_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('Ad_cell_weight.csv',sep=',',header=0)
-# cell_weight_df = pd.read_csv('PBMC3_cell_weight.csv',sep=',',header=0)
 cell_weight_df.columns = ['Cell','Weight']
-# cell_weight_df.sort_values("Weight",inplace=True, ascending=True)
 cell_weight_df.sort_values("Weight",inplace=True, ascending=False)
 Cell_sort = cell_weight_df['Cell'].tolist()
 len(Cell_sort)
 7058
 def load_multilayer_network(input_file):
-    layer_data = {}#key为0，1对应的value是边
-    nodes_lst = []#存的是全部的node
-    nodes = {}#字典 将细胞的名字对应为数字
+    layer_data = {}
+    nodes_lst = []
+    nodes = {}
     cnt=0
     with open(input_file, 'r') as _file:
         for line in _file:
@@ -243,9 +233,7 @@ def load_multilayer_network(input_file):
             nodes_lst.append(data[1])
     _file.close()
 
-#     print('type(nodes_lst) :',type(nodes_lst))
     nodes_lst = list(set(nodes_lst))
-#     print('type(nodes_lst) :',type(nodes_lst))
     for i in range(len(nodes_lst)):
         nodes[nodes_lst[i]] = i
     
@@ -259,13 +247,10 @@ def load_multilayer_network(input_file):
             layer_data[int(float(data[3]))].append((nodes[data[0]], nodes[data[1]],float(data[2])))        
     _file.close()
     
-#     print(nodes)
-#     print(layer_data)
     return nodes, layer_data
 def make_multilayer(layer_data, node_lst):
-    multilayer_network = {} #字典
-#     import pdb
-#     pdb.set_trace()
+    multilayer_network = {} 
+
     for i in layer_data.keys():
             multilayer_network[i] = nx.Graph()
             for edge in layer_data[i]:
@@ -276,52 +261,18 @@ def make_multilayer(layer_data, node_lst):
     return multilayer_network
 
 
-# second_layer=pd.read_csv('PY_sci_CAR_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_An_Ultra_Paired_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_cellmixture_SNARE_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_P0_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_NEAT_seq_MIX_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_PBMC10_scMVP_rna_layer.csv' ,header=0,index_col=0,sep=',')
 second_layer=pd.read_csv('PY_lymph_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_Ad_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_PBMC3_rna_layer.csv' ,header=0,index_col=0,sep=',')
-# second_layer=pd.read_csv('PY_LLL_CTRL_rna_layer.csv' ,header=0,index_col=0,sep=',')
 
-# second_layer=pd.read_csv('PY_NEAT_seq_CD4T_rna_layer.csv' ,header=0,index_col=0,sep=',')
 df_triple=second_layer.stack().reset_index()
 df_triple.columns = ['U','V','Value']
 df_triple_clear=df_triple[df_triple.Value!=0]
 df_triple_clear_Final=df_triple_clear[df_triple_clear['U']!=df_triple_clear['V']]
 df_triple_clear_Final['Layer']= [1 for index in range(len(df_triple_clear_Final))]
 
-# df01_1=pd.read_csv('PY_Ad_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_Ad_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_An_Ultra_Paired_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_An_Ultra_Paired_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
 df01_1=pd.read_csv('PY_lymph_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
 df01_2=pd.read_csv('PY_lymph_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_sci_CAR_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_sci_CAR_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_cellmixture_SNARE_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_cellmixture_SNARE_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_P0_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_P0_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_PBMC10_scMVP_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_PBMC10_scMVP_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_NEAT_seq_MIX_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_NEAT_seq_MIX_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_3=pd.read_csv('PY_NEAT_seq_MIX_ADT_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_NEAT_seq_CD4T_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_NEAT_seq_CD4T_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_3=pd.read_csv('PY_NEAT_seq_CD4T_ADT_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_PBMC3_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_PBMC3_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_1=pd.read_csv('PY_LLL_CTRL_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-# df01_2=pd.read_csv('PY_LLL_CTRL_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',')
-#
 
 first_layer=df01_1+df01_2
-# first_layer=df01_1+df01_2+df01_3
 df01_triple=first_layer.stack().reset_index()
 df01_triple.columns = ['U','V','Value']
 df01_triple_clear=df01_triple[df01_triple.Value!=0]
@@ -329,17 +280,7 @@ df01_triple_clear_Final=df01_triple_clear[df01_triple_clear['U']!=df01_triple_cl
 df01_triple_clear_Final['Layer']= [0 for index in range(len(df01_triple_clear_Final))]
 df01_triple_clear_Final['Value']=df01_triple_clear_Final['Value'].map(lambda x : 1)
 
-# third_layer=pd.read_csv('PY_sci_CAR_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_An_Ultra_Paired_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_cellmixture_SNARE_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_P0_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_PBMC10_scMVP_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_NEAT_seq_MIX_atac_layer.csv',header=0,index_col=0,sep=',')
 third_layer=pd.read_csv('PY_lymph_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_Ad_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_PBMC3_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_NEAT_seq_CD4T_atac_layer.csv',header=0,index_col=0,sep=',')
-# third_layer=pd.read_csv('PY_LLL_CTRL_atac_layer.csv',header=0,index_col=0,sep=',')
 df02_triple=third_layer.stack().reset_index()
 df02_triple.columns = ['U','V','Value']
 df02_triple_clear=df02_triple[df02_triple.Value!=0]
@@ -347,75 +288,28 @@ df02_triple_clear_Final=df02_triple_clear[df02_triple_clear['U']!=df02_triple_cl
 df02_triple_clear_Final['Layer']= [2 for index in range(len(df02_triple_clear_Final))]
 df02_triple_clear_Final
 
-# fourth_layer=pd.read_csv('PY_LLL_CTRL_adt_layer.csv',header=0,index_col=0,sep=',')
-# fourth_layer=pd.read_csv('PY_NEAT_seq_MIX_adt_layer.csv',header=0,index_col=0,sep=',')
-# # # fourth_layer=pd.read_csv('PY_NEAT_seq_CD4T_adt_layer.csv',header=0,index_col=0,sep=',')
-# df03_triple=fourth_layer.stack().reset_index()
-# df03_triple.columns = ['U','V','Value']
-# df03_triple_clear=df03_triple[df03_triple.Value!=0]
-# df03_triple_clear_Final=df03_triple_clear[df03_triple_clear['U']!=df03_triple_clear['V']]
-# df03_triple_clear_Final['Layer']= [3 for index in range(len(df03_triple_clear_Final))]
-# df03_triple_clear_Final
-
-# # frames=[df01_triple_clear_Final]
-# frames=[df01_triple_clear_Final,df_triple_clear_Final,df02_triple_clear_Final,df03_triple_clear_Final]
-# RES=pd.concat(frames)
-# RES.to_csv('PY_NEAT_seq_MIX_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_NEAT_seq_MIX_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# # RES.to_csv('PY_NEAT_seq_CD4T_Tri_no_w.tsv',sep='\t',header=None,index=False)
 
 frames=[df01_triple_clear_Final,df_triple_clear_Final,df02_triple_clear_Final]
 RES=pd.concat(frames)
-# # RES.to_csv('PY_Ad_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_NEAT_seq_MIX_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# # RES.to_csv('PY_NEAT_seq_CD4T_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_PBMC10_scMVP_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_sci_CAR_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_An_Ultra_Paired_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_cellmixture_SNARE_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_P0_Tri_no_w.tsv',sep='\t',header=None,index=False)
+
 RES.to_csv('PY_lymph_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# # RES.to_csv('PY_PBMC3_Tri_no_w.tsv',sep='\t',header=None,index=False)
-# RES.to_csv('PY_LLL_CTRL_Four_no_w.tsv',sep='\t',header=None,index=False)
-# nodes, layer_data = load_multilayer_network('PY_NEAT_seq_MIX_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_NEAT_seq_CD4T_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_cellmixture_SNARE_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_P0_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_LLL_CTRL_Four_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_An_Ultra_Paired_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_PBMC10_scMVP_Tri_no_w.tsv')
-nodes, layer_data = load_multilayer_network('PY_lymph_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_An_Ultra_Paired_rna_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_Ad_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_PBMC3_Tri_no_w.tsv')
-# nodes, layer_data = load_multilayer_network('PY_sci_CAR_Tri_no_w.tsv')
 nodes_lst = sorted(list(nodes.values()))
-len(layer_data)
-4
-len(nodes)
-7058
+
 Cell_Sort_Id=list()
 for i in range(len(Cell_sort)):
     Cell_Sort_Id.append(nodes[Cell_sort[i]])
 cell_weight_df['ID']=Cell_Sort_Id
 Cell_Id_W_dict = dict(zip(cell_weight_df['ID'].tolist(),cell_weight_df['Weight'].tolist()))
-len(Cell_Id_W_dict)
 
 
-multilayer_network=make_multilayer(layer_data, nodes_lst) #multilayer_network是字典，对应的values是值
-7058
-partition = best_partition(multilayer_network,Cell_Id_W_dict,weight='weight',resolution=0.9)#3 0.433(P0)0.9 0.87(lymph) 0.508(PBMC10)
+
+multilayer_network=make_multilayer(layer_data, nodes_lst)
+partition = best_partition(multilayer_network,Cell_Id_W_dict,weight='weight',resolution=0.9)
 community_num = len(set(partition.values()))
 print('Community_Num :',community_num)
-resolution : 2.85
-_one_level_first
-_one_level_second
-_one_level_second
-Community_Num : 6
+
 names = {}
 for n in nodes:
-#     print('n :',n)
-#     print('nodes[n] :',nodes[n])
     names[nodes[n]] = n
 B=[]
 C=[]
@@ -426,51 +320,15 @@ for k in partition.values():
         C.append(k)
 Res=dict(zip(B, C))
 Res = dict(sorted(Res.items(), key=operator.itemgetter(0)))  #按照key值升序
-# print('Res :',Res)
-# Res
-# jsObj = json.dumps(Res)
+
  
-# # fileObject = open('lymph_C_Random.json', 'w')
-# fileObject = open('lymph_C.json', 'w')
-# fileObject.write(jsObj)
-# fileObject.close()
-# label=pd.read_csv('celllinemixture_cluster_omit.csv',sep = ',',header=0)
-# label=pd.read_csv('An_Ultra_cluster_omit_Final_intersect_dc.csv',sep=',',header=0)
-# label=pd.read_csv('sci_CAR_cell_atac.tsv',sep='\t',header=0)
-# label=pd.read_csv('HT_Ad_cluster.csv',sep = ',',header=0)
-# label=pd.read_csv('HT_P0_cluster.csv',sep = ',',header=0) 
-# label=pd.read_csv('PBMC10_scMVP_cluster.csv',sep = ',',header=0)
-# label=pd.read_csv('NEAT_seq_MIX_cluster_new.csv',sep = ',',header=0)
 label=pd.read_csv('lymph_cluster.csv',sep = ',',header=0)
-# label=pd.read_csv('NEAT_seq_CD4_T_cluster.csv',sep = ',',header=0)
-# label=pd.read_csv('SNARE_cellline_cluster.csv',sep = ',',header=0)
-# label=pd.read_csv('PBMC3_cluster.csv',sep = ',',header=0)
-# label=pd.read_csv('NEAT_seq_MIX_cluster_Three.csv',sep = ',',header=0)
-# label=pd.read_csv('LLL_CTRL_cluster.csv',sep = ',',header=0)
-# label_index=label.sort_values(by="cell_id",inplace=False)
-# label_index
-# Y=np.array(label_index['cluster_id'])  
-# len(set(Y))
-# Y=np.array(label_index['cluster_id'])  
-# len(set(Y))
-# #An_Ultra
-# Y=np.array(label['Ident_ID'])
-# len(set(Y))
-# # # # # label_index=label.sort_index()  #HT_celllinemixture
-# Y=np.array(label['A_Type'])
-# # #ATAC_Y=np.array(label['A_Type'])
-# print('len(Y) :',len(set(Y)))
-# Y=np.array(label['Ident'])  #P0 Ad
-# len(set(Y))
-Y=np.array(label['cluster_id'])  #PBMC10_scMVP  lymph SHARE sci_CAR NEAT_seq_MIX
-len(set(Y))
-set(Y)
-{1, 2, 3, 4, 5, 6}
+Y=np.array(label['cluster_id']) 
+
 Pre=[]
 for k in Res.values():
         Pre.append(k)
 Pre=np.array(Pre)
-print(len(set(Pre)))
 metrics.clustering_evaluate(Y,Pre)
 ```
 
