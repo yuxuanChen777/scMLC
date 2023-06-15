@@ -43,23 +43,23 @@ library(foreach)
 library(doParallel)
 library(RcppAnnoy)
 
-getDoParWorkers( )    #查看注册了多少个核，配合doMC package中的registerDoMC( )使用
-getDoParRegistered( ) # 查看doPar是否注册；如果没有注册返回FALSE
-getDoParName( )       #查看已经注册的doPar的名字
-getDoParVersion( )    #查看已经注册的doPar的version
+getDoParWorkers( )  
+getDoParRegistered( ) 
+getDoParName( )       
+getDoParVersion( )   
 getDoParWorkers()
-detectCores() #
+detectCores() 
 registerDoParallel(30)
 
 mix_rna<-read.table('lymph_rna.tsv',sep='\t') #input data
 mix_atac<-read.table('lymph_atac.tsv',sep='\t')
 
 
-# #############################################################################################
+# ##########################################################################################
 rna <- CreateSeuratObject(counts = mix_rna, project = "mix_rna",min.cells = 10)
 atac <- CreateSeuratObject(counts=mix_atac,project = 'mix_atac',assay='ATAC',min.cells = 10)
 ############################################################################################
-#                       第二层scry特征提取的RNA网络                                        #                         
+#                      scRNA-seq single-mode network                                       #                         
 ############################################################################################
 rna <- SCTransform(rna,method = "glmGamPoi",verbose = FALSE) %>% RunPCA()
 ElbowPlot(rna)
@@ -67,7 +67,7 @@ rna <- FindNeighbors(rna, dims = 1:10)#25
 rna_layer <- as.data.frame(rna@graphs$SCT_nn)
 write.table(rna_layer,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_rna_layer.csv',sep = ',',row.names = T,col.names = T) #Output scRNA-seq single-mode network
 ############################################################################################
-#                       第三层scry特征提取的ATAC网络                                       #                         
+#                       scATAC-seq single-mode network                                     #                         
 ############################################################################################
 atac_tmp <-devianceFeatureSelection(as.matrix(mix_atac))
 atac_tmp <- as.data.frame(atac_tmp)
@@ -84,7 +84,7 @@ atac_layer <- as.data.frame(atac@graphs$ATAC_nn)
 write.table(atac_layer,file = '/home/yxchen/JupyterNotebook/Python_Louvain_op/PY_lymph_atac_layer.csv',sep = ',',row.names = T,col.names = T)#Output scATAC-seq single-mode network
 
 ############################################################################################
-#         第一层CCA特征提取网络（此处获得的是RNA，ATAC分别的两层，稍后会网络融合）         #
+#                              Cross-modal feature selection                               #
 ############################################################################################
 rna <- CreateSeuratObject(counts = mix_rna, project = "mix_rna",min.cells = 10)
 atac <- CreateSeuratObject(counts=mix_atac,project = 'mix_atac',assay='ATAC',min.cells = 10)
@@ -134,7 +134,7 @@ atac@assays$ATAC@var.features <- atac_cca
 rna@assays$RNA@var.features <-rna_cca
 #######################################################################
 # #######################################################################
-# #                      构建新的点权方法                               #
+# #     Assigns weights to nodes in the guidance layer network          #
 # #######################################################################
 rna_mm <- as.data.frame(rna@assays$SCT@scale.data)
 atac_mm <-as.data.frame(atac@assays$ATAC@scale.data)
