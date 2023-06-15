@@ -74,7 +74,6 @@ class Status(object):
                 deg = float(graph.degree(node, weight=weight))
                 self.degrees[com] = self.degrees.get(com, 0) + deg 
                 self.gdegrees[node] = deg
-#                 print('点%d的degree: %d'%(node,self.gdegrees[node]))
                 inc = 0.
                 for neighbor, datas in graph[node].items():
                     edge_weight = datas.get(weight, 1)
@@ -87,4 +86,4 @@ class Status(object):
                         else:
                             inc += float(edge_weight) / 2.
                 self.internals[com] = self.internals.get(com, 0) + inc
-#                 print('社区%d内部的degree: %d'%(com,self.internals[com]))
+
