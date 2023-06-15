@@ -56,17 +56,13 @@ def modularity(partition, multi_graph, weight='weight'):
             raise ValueError("A graph without link has an undefined modularity")
 
         for node in graph:
-#             print('node :',node)
-            com = partition[node]#当前node所在的社区编号
-#             print('当前node所在的社区编号 ：',com)
-            deg[com] = deg.get(com, 0.) + graph.degree(node, weight=weight)#此node所在社区的度数
-            for neighbor, datas in graph[node].items():#寻找当前node的邻居
+            com = partition[node]
+
+            deg[com] = deg.get(com, 0.) + graph.degree(node, weight=weight)
+            for neighbor, datas in graph[node].items():
                 edge_weight = datas.get(weight, 1)
-                if partition[neighbor] == com:#若是邻居所在的社区和当前node所在的社区相同
-#                     if neighbor == node:#邻居和当前node是同一个点
-#                         inc[com] = inc.get(com, 0.) + float(edge_weight)#此社区的内部度数/权值加上边权,这个情况不会发生
-#                     else:
-                     inc[com] = inc.get(com, 0.) + float(edge_weight)#此社区的内部度数/权值加上边权除以2
+                if partition[neighbor] == com:
+                     inc[com] = inc.get(com, 0.) + float(edge_weight)
 
         res = 0.
         for com in set(partition.values()):
@@ -102,7 +98,6 @@ def generate_dendrogram(multi_graph,cell_id_w_dict,
                         resolution=1.,
                         randomize=None,
                         random_state=None):
-#     print('resolution :',resolution)
     for i in multi_graph.keys():
         G=multi_graph[i]
         if G.is_directed():
@@ -126,7 +121,7 @@ def generate_dendrogram(multi_graph,cell_id_w_dict,
     # special case, when there is no link
     # the best partition is everyone in its community
     flag=0
-    for i in multi_graph.keys(): #所有网络无边才这么分配
+    for i in multi_graph.keys():
         G = multi_graph[i]
         if G.number_of_edges() != 0:
             flag=1
@@ -141,7 +136,7 @@ def generate_dendrogram(multi_graph,cell_id_w_dict,
             return [part]
 
     S=list()
-    for i in multi_graph.keys(): #对各个层的status初始化
+    for i in multi_graph.keys():
         name='status'+str(i)
         locals()['v'+str(i)]= Status()
         #print('name :',name)
@@ -149,7 +144,7 @@ def generate_dendrogram(multi_graph,cell_id_w_dict,
         current_graph = multi_graph[i]
         locals()['v'+str(i)].init(current_graph, weight,part_init)
     
-    if len(multi_graph) > 1:#将不同层的相同node分到相同的社区编号
+    if len(multi_graph) > 1:
         for i in multi_graph.keys():
             if i==0:
                 continue
@@ -174,7 +169,7 @@ def generate_dendrogram(multi_graph,cell_id_w_dict,
         else :
             multi_graph[i] = induced_graph01(partition, multi_graph[i], weight)  
     sorted(cell_id_w_dict.items(), key=lambda item:item[1], reverse=False)
-    for i in multi_graph.keys(): #对各个层的status初始化
+    for i in multi_graph.keys():
         current_graph = multi_graph[i]
         S[i].init(current_graph, weight, part_init)
     while True:
@@ -193,7 +188,7 @@ def generate_dendrogram(multi_graph,cell_id_w_dict,
             else :
                 multi_graph[i] = induced_graph01(partition, multi_graph[i], weight)  
         sorted(cell_id_w_dict.items(), key=lambda item:item[1], reverse=False)
-        for i in multi_graph.keys(): #对各个层的status初始化
+        for i in multi_graph.keys(): 
             current_graph = multi_graph[i]
             S[i].init(current_graph, weight, part_init)
 ##################################################################################################################
@@ -241,9 +236,8 @@ def induced_graph01(partition, graph, weight="weight"):
 
 def __renumber(dictionary):
     values = set(dictionary.values())
-#     print('旧社区编号values :',values)
+
     target = set(range(len(values)))
-#     print('新社区编号target :',target)
     if values == target:
         ret = dictionary.copy()
     else:
@@ -267,29 +261,26 @@ def __one_level(multi_graph, cell_id_w_dict,S, weight_key, resolution, random_st
     nb_pass_done = 0
     cur_mod = __modularity(S, resolution)
     new_mod = cur_mod
-    graph=multi_graph[0]#以融合网络为主视图
+    graph=multi_graph[0]
     status=S[0]
     while modified and nb_pass_done != __PASS_MAX:
         cur_mod = new_mod
         modified = False
         nb_pass_done += 1
         
-        for node in cell_id_w_dict:  #开始选择节点
-#             print('权值：',cell_id_w_dict[node])
+        for node in cell_id_w_dict: 
+
             remove_cost=0
-#             print('当前节点node :',node)
-            com_node = status.node2com[node]#当前点所属的社区
+            com_node = status.node2com[node]
             degc_totw=list()
             neigh_communities=list()
             for i in multi_graph.keys():
-                degc_totw .append( S[i].gdegrees.get(node, 0.) / (S[i].total_weight * 2.))  # 该点的度(总数加起来是重复计算的并且等于边数的两倍)占总度数(总权值)的比例  print('进入_neighcom')
-           #存储的是字典
+                degc_totw .append( S[i].gdegrees.get(node, 0.) / (S[i].total_weight * 2.)) 
             for i in multi_graph.keys():
                 neigh_communities.append( __neighcom(node, multi_graph[i], S[i], weight_key))
             neigh_com = __neighcom_2(node, multi_graph, S, weight_key)
             for i in multi_graph.keys():
                 com=S[i].node2com[node]
-#                 print('不同层同一个节点的社区号：',com)
                 remove_cost += - resolution * neigh_communities[i].get(com,0) + (S[i].degrees.get(com, 0.) - S[i].gdegrees.get(node, 0.)) * degc_totw[i]    #某节点离开属于他的社区，某节点同属于一个社区的邻居节点的边权都去掉和该节点离开所在社区的度数remove_cost之和（remove cost越小，证明该节点不该移动，越大，证明该节点应该移动）
                 __remove(node,S[i].node2com[node],neigh_communities[i].get(S[i].node2com[node], 0.), S[i])
 
@@ -298,62 +289,46 @@ def __one_level(multi_graph, cell_id_w_dict,S, weight_key, resolution, random_st
             best_w = 1000000000000000
             
             for com, dnc in __randomize(neigh_com.items(), random_state):
-#                 print('邻居com :',com,'社区内和该node当邻居边权之和dnc :',dnc)
                 incr = remove_cost + resolution * dnc
                 for i in  multi_graph.keys():
                     incr += - S[i].degrees.get(com, 0.) * degc_totw[i]
 
            
-                if incr >= best_increase : #改进随机性
+                if incr >= best_increase :
                     if incr > best_increase:
                         best_increase = incr
                         best_com = com
-#                         print('com :',com)
                         best_w = cell_id_w_dict[com]
                     elif  incr == best_increase and cell_id_w_dict[com] > best_w:
-#                         print('ok')
                         best_increase = incr
                         best_com = com
                         best_w = cell_id_w_dict[com]
             for i in multi_graph.keys():
                 __insert(node,best_com,neigh_communities[i].get(best_com, 0.), S[i])
             if best_com != com_node:
-                modified = True#继续修改
+                modified = True
         new_mod = __modularity(S, resolution)
         if new_mod - cur_mod < __MIN:
             break
 
 
 def __neighcom(node, graph, status, weight_key):
-#     print('node :',node)
-    weights = {}#字典,每次轮到一个新的node,weights都是重新计算的
-    #print('_neighcom')
-#     print('type(weights) :',type(weights))
+    weights = {}
     for neighbor, datas in graph[node].items():
-#         print('neighbor :',neighbor)
         if neighbor != node:
             edge_weight = datas.get(weight_key, 1)
-#             print('邻居和该点的边权edge_weight :',edge_weight)
-            neighborcom = status.node2com[neighbor]#邻居所在的社区
-#             print('邻居所在的社区编号 ：',neighborcom)
+            neighborcom = status.node2com[neighbor]
             weights[neighborcom] = weights.get(neighborcom, 0) + edge_weight 
-#             print('weights[%d] :%d'%(neighborcom,weights[neighborcom]))
     return weights
 
 def __neighcom_2(node, multi_graph, S, weight_key):
-#     print('node :',node)
-    weights = {}#字典,每次轮到一个新的node,weights都是重新计算的
-#     print('_neighcom')
-#     print('type(weights) :',type(weights))
+    weights = {}
     for i in multi_graph.keys():
         graph=multi_graph[i]
         for neighbor, datas in graph[node].items():
-#             print('neighbor :',neighbor)
             if neighbor != node:
                 edge_weight = datas.get(weight_key, 1)
-#                 print('邻居和该点的边权edge_weight :',edge_weight)
-                neighborcom = S[i].node2com[neighbor]#邻居所在的社区
-#                 print('邻居所在的社区编号 ：',neighborcom)
+                neighborcom = S[i].node2com[neighbor]
                 if neighborcom in weights.keys():
                     weights[neighborcom] += edge_weight 
                 else:
@@ -364,9 +339,9 @@ def __neighcom_2(node, multi_graph, S, weight_key):
 def __remove(node, com, weight, status):
     """ Remove node from community com and modify status"""
     status.degrees[com] = (status.degrees.get(com, 0.)
-                           - status.gdegrees.get(node, 0.))#社区的度（内外都有）改变
+                           - status.gdegrees.get(node, 0.))
 #     print('remove status.degrees[%d] :%d'%(com,status.degrees[com]))
-    status.internals[com] = float(status.internals.get(com, 0.) - weight - status.loops.get(node, 0.))#社区内部的度改变
+    status.internals[com] = float(status.internals.get(com, 0.) - weight - status.loops.get(node, 0.))
 #     print('remove status.internals[%d] :%d'%(com,status.internals[com]))
     status.node2com[node] = -1
 #     print('remove status.node2com[%d] :%d'%(node,status.node2com[node]))
@@ -375,10 +350,9 @@ def __remove(node, com, weight, status):
 def __insert(node, com, weight, status):
     """ Insert node into community and modify status"""
     status.node2com[node] = com
-#     print('insert后该node%d所属的社区 :%d'%(node,com))
-    status.degrees[com] = (status.degrees.get(com, 0.) + status.gdegrees.get(node, 0.))#和这个社区有关的所有的度和/权值和
+    status.degrees[com] = (status.degrees.get(com, 0.) + status.gdegrees.get(node, 0.))
 #     print('insert status.degrees[%d] :%d'%(com,status.degrees[com]))
-    status.internals[com] = float(status.internals.get(com, 0.) + weight + status.loops.get(node, 0.))#和这个社区的内部度和/权值和
+    status.internals[com] = float(status.internals.get(com, 0.) + weight + status.loops.get(node, 0.))
 #     print('insert status.internals[%d] :%d'%(com,status.internals[com]))
 
 def __modularity(S, resolution):
@@ -391,15 +365,15 @@ def __modularity(S, resolution):
     for status in S:
         #print('cnt:',cnt)
         
-        links = float(status.total_weight)#图中的总边数or总权值
+        links = float(status.total_weight)
         result = 0.
         for community in set(status.node2com.values()):
             in_degree = status.internals.get(community, 0.)
             degree = status.degrees.get(community, 0.)
             if links > 0:
-                 #result += possibility[cnt]*(in_degree * resolution / links -  ((degree / (2. * links)) ** 2))#尝试调整resolution乘的位置
-                result += (in_degree * resolution / links -  ((degree / (2. * links)) ** 2))#尝试调整resolution乘的位置
-                #result += in_degree / links -  (resolution*(degree / (2. * links)) ** 2)#resolution可能需要改进的地方******
+                 #result += possibility[cnt]*(in_degree * resolution / links -  ((degree / (2. * links)) ** 2))
+                result += (in_degree * resolution / links -  ((degree / (2. * links)) ** 2))
+                #result += in_degree / links -  (resolution*(degree / (2. * links)) ** 2)
         result_sum +=result
       
     #print('_modularity :',result_sum)
@@ -408,7 +382,7 @@ def __modularity(S, resolution):
 
 def __randomize(items, random_state):
     """Returns a List containing a random permutation of items"""
-    randomized_items = list(items)#图中点的list
-    random_state.shuffle(randomized_items)#打乱list中点的顺序
+    randomized_items = list(items)
+    random_state.shuffle(randomized_items)
     return randomized_items
 
