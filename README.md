@@ -21,12 +21,12 @@ Lymph: RNA + ATAC
 
 # Usage
 
-Run the code in this way
+**Run the code in this way**
 ```
 run the lymph.R  
 run the Louvain.ipynb
 ```
-Preprocessing
+**Preprocessing**
 ```
 getwd()
 setwd('/home/yxchen/R/R_data/Seurat/Lymph')
