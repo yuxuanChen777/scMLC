@@ -31,15 +31,15 @@ run the Louvain.ipynb
 mix_rna<-read.table('lymph_rna.tsv',sep='\t') #input data
 mix_atac<-read.table('lymph_atac.tsv',sep='\t')
 ```
-**multiplex network community detection  Louvain.ipynb**
+**Multiplex network community detection  Louvain.ipynb**
 ```
 cell_weight_df = pd.read_csv('lymph_cell_weight.csv',sep=',',header=0) # cell_weight lymph
 second_layer=pd.read_csv('PY_lymph_rna_layer.csv' ,header=0,index_col=0,sep=',')# scRNA-seq single-mode network  
 df01_1=pd.read_csv('PY_lymph_RNA_SGCCA_layer.csv',header=0,index_col=0,sep=',') # scRNA-seq cross-mode network  
 df01_2=pd.read_csv('PY_lymph_ATAC_SGCCA_layer.csv',header=0,index_col=0,sep=',') # scATAC-seq cross-mode network  
 third_layer=pd.read_csv('PY_lymph_atac_layer.csv',header=0,index_col=0,sep=',') # scATAC-seq single-mode network  
-RES.to_csv('PY_lymph_Tri_no_w.tsv',sep='\t',header=None,index=False) # multi-plex network  
-nodes, layer_data = load_multilayer_network('PY_lymph_Tri_no_w.tsv') # load multi-plex network
+RES.to_csv('PY_lymph_Tri_no_w.tsv',sep='\t',header=None,index=False) # multiplex network  
+nodes, layer_data = load_multilayer_network('PY_lymph_Tri_no_w.tsv') # load multiplex network
 label=pd.read_csv('lymph_cluster.csv',sep = ',',header=0) #True Label
 ```
 
