@@ -20,7 +20,7 @@ Lymph: RNA + ATAC
  * The last step is clustering by the multiplex network Louvain.
 
 # R Packages version
-'''
+```
 sessionInfo()
 R version 4.2.0 (2022-04-22)
 Platform: x86_64-pc-linux-gnu (64-bit)
@@ -74,7 +74,7 @@ loaded via a namespace (and not attached):
 [111] jsonlite_1.8.5            viridisLite_0.4.2         askpass_1.1               fansi_1.0.4               pillar_1.9.0             
 [116] lattice_0.20-45           fastmap_1.1.1             httr_1.4.6                survival_3.5-5            glue_1.6.2               
 [121] png_0.1-8                 stringi_1.7.12            BiocSingular_1.12.0       irlba_2.3.5.1             future.apply_1.11.0 
-'''
+```
 
 # Usage
 
