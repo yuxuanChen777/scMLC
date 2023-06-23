@@ -75,6 +75,10 @@ loaded via a namespace (and not attached):
 [116] lattice_0.20-45           fastmap_1.1.1             httr_1.4.6                survival_3.5-5            glue_1.6.2               
 [121] png_0.1-8                 stringi_1.7.12            BiocSingular_1.12.0       irlba_2.3.5.1             future.apply_1.11.0 
 ```
+# Python version
+```
+Python 3.7.11
+```
 
 # Usage
 
